@@ -14,6 +14,27 @@ service ForkingService {
 
   // Return the current state of the forked network.
   rpc GetStatus(GetStatusRequest) returns (GetStatusResponse);
+
+  // Replace the Move contents of an existing object, keeping its type and owner, and seal the
+  // change into a new checkpoint. For local testing only: it bypasses Move type safety.
+  rpc SetObject(SetObjectRequest) returns (SetObjectResponse);
+}
+
+message SetObjectRequest {
+  // The object to change. It must be a Move object that is not a coin.
+  optional string object_id = 1;
+
+  // The new BCS-encoded Move struct, including the object's own UID as its first field.
+  optional bytes contents = 2;
+}
+
+message SetObjectResponse {
+  // The object's new version and digest.
+  uint64 version = 1;
+  string digest = 2;
+
+  // Sequence number of the checkpoint that holds the change.
+  uint64 checkpoint_sequence_number = 3;
 }
 
 message AdvanceClockRequest {
